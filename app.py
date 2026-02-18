@@ -12,31 +12,64 @@ st.set_page_config(
     layout="wide",
 )
 
-px.defaults.template = "plotly_white"
+px.defaults.template = "plotly_dark"
 
 # =====================================================
-# ESTILO PERSONALIZADO
+# ESTILO DARK EXECUTIVO
 # =====================================================
 
 st.markdown("""
-    <style>
-        .main {
-            background-color: #f8f9fa;
-        }
-        h1, h2, h3 {
-            font-weight: 700;
-        }
-        .stMetric {
-            background-color: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0px 3px 8px rgba(0,0,0,0.05);
-        }
-    </style>
+<style>
+
+/* Fundo principal */
+.main {
+    background: linear-gradient(90deg, #0f172a, #0b1120);
+}
+
+/* Títulos */
+h1, h2, h3 {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Subtítulos e textos */
+p, span {
+    color: #cbd5e1;
+}
+
+/* Cards das métricas */
+div[data-testid="metric-container"] {
+    background: #111827;
+    border: 1px solid #1f2937;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Hover suave */
+div[data-testid="metric-container"]:hover {
+    transform: translateY(-4px);
+    transition: 0.3s ease;
+}
+
+/* Label da métrica */
+div[data-testid="metric-container"] label {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+/* Valor da métrica */
+div[data-testid="metric-container"] div {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+</style>
 """, unsafe_allow_html=True)
 
 # =====================================================
-# CARREGAMENTO DOS DADOS COM CACHE
+# CARREGAMENTO DOS DADOS
 # =====================================================
 
 @st.cache_data
@@ -48,11 +81,10 @@ def load_data():
 df = load_data()
 
 # =====================================================
-# SIDEBAR - FILTROS
+# SIDEBAR
 # =====================================================
 
 st.sidebar.header("🔎 Filtros")
-st.sidebar.markdown("Refine sua análise utilizando os filtros abaixo:")
 
 anos = st.sidebar.multiselect(
     "Ano",
@@ -79,7 +111,7 @@ tamanhos = st.sidebar.multiselect(
 )
 
 # =====================================================
-# APLICAÇÃO DOS FILTROS
+# FILTRAGEM
 # =====================================================
 
 df_filtrado = df[
@@ -90,23 +122,16 @@ df_filtrado = df[
 ]
 
 # =====================================================
-# TÍTULO E CONTEXTO DO PROJETO
+# TÍTULO
 # =====================================================
 
-st.title("📊 Dashboard de Análise de Salários na Área de Dados")
+st.title("📊 Dashboard de Salários na Área de Dados")
 
 st.markdown("""
-### 🎯 Objetivo do Projeto
+Análise exploratória de salários na área de dados considerando  
+**senioridade, contrato, localização e porte da empresa**.
 
-Este dashboard foi desenvolvido para analisar tendências salariais na área de dados,
-identificando como fatores como **senioridade, tipo de contrato, localização e tamanho da empresa**
-impactam a remuneração.
-
-**Tecnologias utilizadas:**
-- Python
-- Pandas
-- Streamlit
-- Plotly
+Ferramentas utilizadas: Python, Pandas, Streamlit e Plotly.
 """)
 
 if df_filtrado.empty:
@@ -138,7 +163,7 @@ col4.metric("👔 Cargo Mais Frequente", cargo_mais_frequente)
 st.divider()
 
 # =====================================================
-# INSIGHTS AUTOMÁTICOS
+# INSIGHTS
 # =====================================================
 
 st.subheader("🧠 Principais Insights")
@@ -155,21 +180,20 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.info(f"""
-    📈 O cargo com maior média salarial entre os 10 principais é:
+    📈 Cargo com maior média salarial:
     **{top_cargos.iloc[-1]['cargo']}**
 
-    💵 Média salarial desse cargo:
-    **${top_cargos.iloc[-1]['usd']:,.0f}**
+    💵 Média: **${top_cargos.iloc[-1]['usd']:,.0f}**
     """)
 
 with col2:
     dispersao = salario_maximo - salario_medio
     st.success(f"""
-    💰 A diferença entre o salário máximo e o salário médio é de:
+    💰 Diferença entre salário máximo e médio:
 
     **${dispersao:,.0f}**
 
-    Isso indica uma alta dispersão salarial no mercado.
+    Indica alta dispersão salarial no mercado.
     """)
 
 st.divider()
@@ -188,8 +212,8 @@ with col1:
         x="usd",
         y="cargo",
         orientation="h",
-        labels={"usd": "Média salarial anual (USD)", "cargo": ""},
-        title="Top 10 cargos por salário médio"
+        title="Top 10 Cargos por Salário Médio",
+        labels={"usd": "Média Salarial (USD)", "cargo": ""}
     )
     fig_cargos.update_layout(margin=dict(l=20, r=20, t=50, b=20))
     st.plotly_chart(fig_cargos, use_container_width=True)
@@ -199,8 +223,8 @@ with col2:
         df_filtrado,
         x="usd",
         nbins=30,
-        title="Distribuição de Salários",
-        labels={"usd": "Faixa salarial (USD)"}
+        title="Distribuição Salarial",
+        labels={"usd": "Faixa Salarial (USD)"}
     )
     fig_hist.update_layout(margin=dict(l=20, r=20, t=50, b=20))
     st.plotly_chart(fig_hist, use_container_width=True)
@@ -220,7 +244,7 @@ with col3:
         names="tipo_trabalho",
         values="quantidade",
         hole=0.5,
-        title="Proporção dos Tipos de Trabalho"
+        title="Tipos de Trabalho"
     )
     fig_remoto.update_layout(margin=dict(l=20, r=20, t=50, b=20))
     st.plotly_chart(fig_remoto, use_container_width=True)
@@ -236,19 +260,20 @@ with col4:
             locations="residencia_iso3",
             color="usd",
             color_continuous_scale="Blues",
-            title="Salário Médio de Cientista de Dados por País",
+            title="Salário Médio de Data Scientist por País"
         )
         fig_paises.update_layout(margin=dict(l=20, r=20, t=50, b=20))
         st.plotly_chart(fig_paises, use_container_width=True)
     else:
-        st.info("Nenhum registro encontrado para Data Scientist.")
+        st.info("Sem registros para Data Scientist.")
 
 st.divider()
 
 # =====================================================
-# TABELA DETALHADA
+# TABELA
 # =====================================================
 
 st.subheader("📄 Dados Detalhados")
 st.dataframe(df_filtrado, use_container_width=True, height=400)
+
 
